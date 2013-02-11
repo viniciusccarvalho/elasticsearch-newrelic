@@ -14,6 +14,9 @@
                 <exclude>org.elasticsearch:elasticsearch</exclude>
             </excludes>
             <unpack>true</unpack>
+            <unpackOptions>
+            <excludes><exclude>**/*.java</exclude></excludes>
+            </unpackOptions>
         </dependencySet>
        
     </dependencySets>
