@@ -11,43 +11,34 @@ import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.logging.ESLoggerFactory;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.river.AbstractRiverComponent;
-import org.elasticsearch.river.River;
-import org.elasticsearch.river.RiverName;
-import org.elasticsearch.river.RiverSettings;
+import org.elasticsearch.node.Node;
 import org.elasticsearch.threadpool.ThreadPool;
 
 import com.newrelic.api.agent.NewRelic;
 
-public class NewRelicRiver extends AbstractRiverComponent implements River {
+public class NewRelicNodeAgent {
 
-	private Client client;
-
+	private final Client client;
 	private final ThreadPool threadPool;
-
+	
+	private final ESLogger logger = ESLoggerFactory.getLogger(NewRelicNodeAgent.class.getName());
+	
+	
 	@Inject
-	public NewRelicRiver(RiverName riverName, RiverSettings settings, Client client, ThreadPool threadPool) {
-		super(riverName, settings);
+	public NewRelicNodeAgent(Client client, ThreadPool threadPool, Node node){
 		this.client = client;
-		logger.debug("Configuring NewRelic River");
 		this.threadPool = threadPool;
-
-	}
-
-	public void start() {
-		logger.debug("Starting NewRelic River");
+		
 		threadPool.scheduleWithFixedDelay(new Runnable() {
 
 			public void run() {
 				sendData();
 			}
 		},TimeValue.timeValueSeconds(10L));
+		
 	}
-
-	public void close() {
-
-	}
-
+	
+	
 	private void sendData() {
 		long start = 0L;
 		if (logger.isDebugEnabled()) {
@@ -78,5 +69,5 @@ public class NewRelicRiver extends AbstractRiverComponent implements River {
 		}
 
 	}
-
+	
 }
