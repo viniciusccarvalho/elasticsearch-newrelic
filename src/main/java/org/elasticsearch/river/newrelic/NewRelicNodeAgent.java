@@ -21,14 +21,16 @@ public class NewRelicNodeAgent {
 	private final Client client;
 	private final ThreadPool threadPool;
 	
-	private final ESLogger logger = ESLoggerFactory.getLogger(NewRelicNodeAgent.class.getName());
-	
+	private final ESLogger logger = ESLoggerFactory.getLogger("NewRelicNodeAgent");
+	private final String nodeName;
+	private final String clusterName;
 	
 	@Inject
 	public NewRelicNodeAgent(Client client, ThreadPool threadPool, Node node){
 		this.client = client;
 		this.threadPool = threadPool;
-		
+		this.nodeName = node.settings().get("name");
+		this.clusterName = node.settings().get("cluster.name");
 		threadPool.scheduleWithFixedDelay(new Runnable() {
 
 			public void run() {
@@ -40,34 +42,43 @@ public class NewRelicNodeAgent {
 	
 	
 	private void sendData() {
-		long start = 0L;
-		if (logger.isDebugEnabled()) {
-			start = System.currentTimeMillis();
-			logger.debug("Fetching data from nodes");
-		}
-
-		NodesStatsResponse nodesStats = client.admin().cluster().nodesStats(new NodesStatsRequest()).actionGet();
-		if (logger.isDebugEnabled()) {
-			logger.debug("Data fetched in {} ms", System.currentTimeMillis() - start);
-		}
-		Map<String, Float> consolidatedStats = new HashMap<String, Float>();
+		
 
 		
-		for (NodeStats stats : nodesStats.getNodes()) {
-			
-			if (stats.getIndices() != null) {
-				consolidatedStats.put("indices.size", new Float(stats.getIndices().getStore().getSize().bytesAsInt()));
-				if (stats.getIndices().getSearch().total().getQueryCount() != 0) {
-					consolidatedStats.put("indices.search.average", (float) (stats.getIndices().getSearch().total().getQueryTimeInMillis() / stats.getIndices().getSearch().total().getQueryCount()));
-				}
+		//TODO: There should be an way to get the node Id, but at construction we don't have it
+		
+		NodesStatsResponse response = client.admin().cluster().nodesStats(new NodesStatsRequest()).actionGet();
+		NodeStats node = null;
+		for(NodeStats n : response.nodes()){
+			if(n.node().getName().equals(this.nodeName)){
+				node = n;
+				break;
 			}
 		}
-		logger.debug("Recording data to new relic");
-		for (String key : consolidatedStats.keySet()) {
-			NewRelic.recordMetric(key, consolidatedStats.get(key));
-			logger.debug("[{}] : {} ", key, consolidatedStats.get(key));
+		
+		if(node != null){
+			
+			Map<String, Float> consolidatedStats = new HashMap<String, Float>();
+			
+			
+			logger.debug("Recording data to new relic");
+			
+			for (String key : consolidatedStats.keySet()) {
+				NewRelic.recordMetric(key, consolidatedStats.get(key));
+				logger.debug("[{}] : {} ", key, consolidatedStats.get(key));
+			}
+			
 		}
+		
+		
 
+	}
+	
+	private void addIndicesStats(Map<String,Float> map, NodeStats stats){
+		String prefix = this.clusterName+"."+this.nodeName+".indices";
+		map.put(prefix+".store.size", new Float((int)stats.getIndices().getStore().getSizeInBytes()));
+		map.put(prefix+".cache.fieldEvictions", new Float(stats.getIndices().getCache().fieldEvictions()));
+		
 	}
 	
 }
