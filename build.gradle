@@ -1,0 +1,21 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+
+sourceCompatibility = 1.6
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.elasticsearch:elasticsearch:0.20.4'
+    compile 'org.apache.commons:commons-jexl:2.1.1'
+    compile 'com.newrelic.agent.java:newrelic-api:2.14.0'
+    testCompile 'junit:junit:4.8.2'
+}
+
+
+jar {
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
