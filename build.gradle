@@ -1,5 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin:'application'
 
 
 sourceCompatibility = 1.6
@@ -8,13 +9,36 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+	provided
+}
+
+sourceSets {
+	main.compileClasspath += configurations.provided
+	test.compileClasspath += configurations.provided
+	test.runtimeClasspath += configurations.provided
+}
+
+
 dependencies {
-    compile 'org.elasticsearch:elasticsearch:0.20.5'
+    provided 'org.elasticsearch:elasticsearch:0.20.5'
     compile 'com.newrelic.agent.java:newrelic-api:2.14.0'
     testCompile 'junit:junit:4.8.2'
 }
 
 
 jar {
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from { 
+		configurations.compile.collect { 
+				if(it.isDirectory()){
+					it
+				}else{
+					filtered = zipTree(it).matching {
+						exclude "**/*.java"
+					}
+					filtered
+				}
+					
+			} 
+		}
 }
