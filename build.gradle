@@ -9,8 +9,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.elasticsearch:elasticsearch:0.20.4'
-    compile 'org.apache.commons:commons-jexl:2.1.1'
+    compile 'org.elasticsearch:elasticsearch:0.20.5'
     compile 'com.newrelic.agent.java:newrelic-api:2.14.0'
     testCompile 'junit:junit:4.8.2'
 }

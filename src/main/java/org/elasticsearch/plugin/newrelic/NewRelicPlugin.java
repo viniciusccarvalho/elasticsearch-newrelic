@@ -1,4 +1,4 @@
-package org.elasticsearch.plugin.river.newrelic;
+package org.elasticsearch.plugin.newrelic;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,7 +8,6 @@ import org.elasticsearch.common.inject.Module;
 import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.logging.ESLoggerFactory;
 import org.elasticsearch.plugins.AbstractPlugin;
-import org.elasticsearch.river.newrelic.NewRelicModule;
 
 public class NewRelicPlugin extends AbstractPlugin {
 

@@ -1,4 +1,4 @@
-package org.elasticsearch.river.newrelic;
+package org.elasticsearch.plugin.newrelic;
 
 import org.elasticsearch.common.inject.AbstractModule;
 
