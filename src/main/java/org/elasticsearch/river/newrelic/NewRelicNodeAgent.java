@@ -41,6 +41,7 @@ public class NewRelicNodeAgent {
 		this.nodeName = node.settings().get("name");
 		this.clusterName = node.settings().get("cluster.name");
 		this.properties = new Properties();
+		
 		try {
 			logger.debug("Loading metrics properties");
 			this.properties.load(NewRelicNodeAgent.class.getClassLoader().getResourceAsStream("metrics.properties"));
@@ -95,9 +96,9 @@ public class NewRelicNodeAgent {
 			}
 			
 		}
-		
-		
-
+	}
+	
+	private void indicesStats(Map<String,Float> consolidatedStats, NodeStats node) {
 	}
 	
 	private void addIndicesStats(Map<String,Float> map, NodeStats stats){
