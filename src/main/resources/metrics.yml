@@ -1,0 +1,6 @@
+stats
+ indicies: true
+ fs : true
+ network: true
+ 
+

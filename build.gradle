@@ -19,6 +19,7 @@ sourceSets {
 	test.runtimeClasspath += configurations.provided
 }
 
+eclipse.classpath.plusConfigurations += configurations.provided
 
 dependencies {
     provided 'org.elasticsearch:elasticsearch:0.20.5'
