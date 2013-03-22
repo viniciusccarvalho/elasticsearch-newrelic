@@ -1,3 +1,21 @@
+/*
+ * Licensed to ElasticSearch under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. ElasticSearch licenses this
+ * file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.elasticsearch.plugin.newrelic.agents;
 
 import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
@@ -26,19 +44,21 @@ public class IndicesAgent extends NodeAgent implements Runnable {
 			if (searchStats != null) {
 				float qpms = (float) searchStats.total().getQueryCount() / Math.max(1, searchStats.total().getQueryTimeInMillis());
 				float fpms = (float) searchStats.total().getFetchCount() / Math.max(1, searchStats.total().getFetchTimeInMillis());
-				float gpms = (float) indiceStats.get().getCount() / Math.max(1, indiceStats.get().getTimeInMillis());
+				
 
 				collector.recordMetric("indices.search.query_per_second", qpms * 1000);
 				collector.recordMetric("indices.search,query_time_millis", 1 / qpms);
 				collector.recordMetric("indices.search.fetch_per_second", fpms * 1000);
 				collector.recordResponseTimeMetric("indices.search.fetch_time_millis", (long) (1 / fpms));
-				collector.recordMetric("indices.get.get_per_second", gpms * 1000);
-				collector.recordResponseTimeMetric("indices.get.get_time_millis", (long) (1 / gpms));
+				
 			}
 
 			if (getStats != null) {
+				float gpms = (float) indiceStats.get().getCount() / Math.max(1, indiceStats.get().getTimeInMillis());
 				collector.recordMetric("indices.get.exists", getStats.existsCount());
 				collector.recordMetric("indices.get.missing", getStats.missingCount());
+				collector.recordMetric("indices.get.get_per_second", gpms * 1000);
+				collector.recordResponseTimeMetric("indices.get.get_time_millis", (long) (1 / gpms));
 			}
 
 			if (cacheStats != null) {
