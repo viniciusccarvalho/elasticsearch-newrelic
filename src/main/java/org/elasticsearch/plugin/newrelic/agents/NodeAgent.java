@@ -20,6 +20,7 @@ package org.elasticsearch.plugin.newrelic.agents;
 
 import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
 import org.elasticsearch.plugin.newrelic.collector.MetricCollector;
+import org.elasticsearch.plugin.newrelic.collector.NewRelicCollector;
 
 public abstract class NodeAgent {
 	
@@ -29,6 +30,7 @@ public abstract class NodeAgent {
 	
 	public NodeAgent(NodeStats nodeStats) {
 		this.nodeStats = nodeStats;
+		this.collector = new NewRelicCollector();
 	}
 
 	public void setCollector(MetricCollector collector) {
