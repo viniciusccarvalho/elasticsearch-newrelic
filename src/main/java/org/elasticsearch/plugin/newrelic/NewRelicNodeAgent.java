@@ -43,7 +43,6 @@ public class NewRelicNodeAgent {
 	private final ESLogger logger = ESLoggerFactory.getLogger(NewRelicNodeAgent.class.getName());
 	private final String nodeName;
 	private final String clusterName;
-	private final Properties properties;
 
 	@Inject
 	public NewRelicNodeAgent(Client client, final ThreadPool threadPool, Node node) {
@@ -51,19 +50,8 @@ public class NewRelicNodeAgent {
 		this.threadPool = threadPool;
 		this.nodeName = node.settings().get("name");
 		this.clusterName = node.settings().get("cluster.name");
-		this.properties = new Properties();
 
-		try {
-			logger.debug("Loading metrics properties");
-			this.properties.load(NewRelicNodeAgent.class.getClassLoader().getResourceAsStream("metrics.properties"));
-			if (logger.isDebugEnabled()) {
-				for (Object key : properties.keySet()) {
-					logger.debug("{}", key);
-				}
-			}
-		} catch (IOException e) {
-			throw new RuntimeException("Could not read metrics file, plugin can not be loaded");
-		}
+		
 		threadPool.scheduleWithFixedDelay(new Runnable() {
 
 			public void run() {

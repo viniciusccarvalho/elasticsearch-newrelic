@@ -26,6 +26,7 @@ import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
 import org.elasticsearch.index.search.stats.SearchStats;
 import org.elasticsearch.index.search.stats.SearchStats.Stats;
 import org.elasticsearch.indices.NodeIndicesStats;
+import org.elasticsearch.plugin.newrelic.agents.HttpAgent;
 import org.elasticsearch.plugin.newrelic.agents.IndicesAgent;
 import org.junit.Test;
 
@@ -86,6 +87,13 @@ public class IndicesAgentTest {
 		agent.run();
 		Assert.assertEquals(6000.0f, collector.getStats().get("indices.search.query_per_second"));
 		Assert.assertEquals(1/6f, collector.getStats().get("indices.search,query_time_millis"));
+	}
+	
+	@Test
+	public void what(){
+		NodeStats nodeStats = mock(NodeStats.class);
+		HttpAgent agent = new HttpAgent(nodeStats);
+		agent.run();
 	}
 	
 	
