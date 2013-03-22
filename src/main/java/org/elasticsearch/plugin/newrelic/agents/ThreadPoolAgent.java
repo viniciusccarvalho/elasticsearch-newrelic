@@ -38,10 +38,10 @@ public class ThreadPoolAgent extends NodeAgent implements Runnable {
 			while(it.hasNext()){
 				Stats stats = it.next();
 				if(stats != null){
-					collector.recordMetric("pool."+stats.getName()+".active", stats.active());
-					collector.recordMetric("pool."+stats.getName()+".queue", stats.queue());
-					collector.recordMetric("pool."+stats.getName()+".rejected", stats.rejected());
-					collector.recordMetric("pool."+stats.getName()+".threads", stats.threads());
+					collector.recordMetric("pool/"+stats.getName()+"/active", stats.active());
+					collector.recordMetric("pool/"+stats.getName()+"/queue", stats.queue());
+					collector.recordMetric("pool/"+stats.getName()+"/rejected", stats.rejected());
+					collector.recordMetric("pool/"+stats.getName()+"/threads", stats.threads());
 				}
 			}
 		}

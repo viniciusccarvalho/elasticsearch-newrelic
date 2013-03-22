@@ -89,12 +89,6 @@ public class IndicesAgentTest {
 		Assert.assertEquals(1/6f, collector.getStats().get("indices.search,query_time_millis"));
 	}
 	
-	@Test
-	public void what(){
-		NodeStats nodeStats = mock(NodeStats.class);
-		HttpAgent agent = new HttpAgent(nodeStats);
-		agent.run();
-	}
 	
 	
 }

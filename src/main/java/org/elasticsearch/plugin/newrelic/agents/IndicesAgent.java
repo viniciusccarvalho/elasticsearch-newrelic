@@ -45,49 +45,49 @@ public class IndicesAgent extends NodeAgent implements Runnable {
 				float qpms = (float) searchStats.total().getQueryCount() / Math.max(1, searchStats.total().getQueryTimeInMillis());
 				float fpms = (float) searchStats.total().getFetchCount() / Math.max(1, searchStats.total().getFetchTimeInMillis());
 				
-				collector.recordMetric("indices.search.total.query_count",searchStats.total().getQueryCount() );
-				collector.recordMetric("indices.search.total.query_time_millis",searchStats.total().getQueryTimeInMillis());
-				collector.recordMetric("indices.search.queries_per_second", qpms * 1000);
-				collector.recordMetric("indices.search.average_query_time_millis",  (qpms == 0 ? 0 : (1.0f / qpms)));
-				collector.recordMetric("indices.search.total.fetch_count",searchStats.total().getFetchCount() );
-				collector.recordMetric("indices.search.total.fetch_time_millis",searchStats.total().getFetchTimeInMillis());
-				collector.recordMetric("indices.search.fetches_per_second", fpms * 1000);
-				collector.recordMetric("indices.search.average_fetch_time_millis",  (fpms == 0 ? 0 : (1.0f / fpms)));
+				collector.recordMetric("indices/search/total_query_count",searchStats.total().getQueryCount() );
+				collector.recordMetric("indices/search/total_query_time_millis",searchStats.total().getQueryTimeInMillis());
+				collector.recordMetric("indices/search/queries_per_second", qpms * 1000);
+				collector.recordMetric("indices/search/average_query_time_millis",  (qpms == 0 ? 0 : (1.0f / qpms)));
+				collector.recordMetric("indices/search/total_fetch_count",searchStats.total().getFetchCount() );
+				collector.recordMetric("indices/search/total_fetch_time_millis",searchStats.total().getFetchTimeInMillis());
+				collector.recordMetric("indices/search/fetches_per_second", fpms * 1000);
+				collector.recordMetric("indices/search/average_fetch_time_millis",  (fpms == 0 ? 0 : (1.0f / fpms)));
 				
 			}
 
 			if (getStats != null) {
 				float gpms = (float) indiceStats.get().getCount() / Math.max(1, indiceStats.get().getTimeInMillis());
 				
-				collector.recordMetric("indices.get.total.get",getStats.count() );
-				collector.recordMetric("indices.get.total.get_time_millis",getStats.getTimeInMillis());
+				collector.recordMetric("indices/get/total",getStats.count() );
+				collector.recordMetric("indices/get/time_millis",getStats.getTimeInMillis());
 				
-				collector.recordMetric("indices.get.exists", getStats.existsCount());
-				collector.recordMetric("indices.get.missing", getStats.missingCount());
-				collector.recordMetric("indices.get.gets_per_second", gpms * 1000);
-				collector.recordMetric("indices.get.average_get_time_millis", (gpms == 0 ? 0 : (1.0f / gpms)));
+				collector.recordMetric("indices/get/exists", getStats.existsCount());
+				collector.recordMetric("indices/get/missing", getStats.missingCount());
+				collector.recordMetric("indices/get/gets_per_second", gpms * 1000);
+				collector.recordMetric("indices/get/average_time_millis", (gpms == 0 ? 0 : (1.0f / gpms)));
 			}
 
 			if (cacheStats != null) {
-				collector.recordMetric("indices.cache.field_evictions", cacheStats.getFieldEvictions());
-				collector.recordMetric("indices.cache.filter_evictions", cacheStats.getFilterEvictions());
-				collector.recordMetric("indices.cache.filter_count", cacheStats.getFilterCount());
-				collector.recordMetric("indices.cache.field_size", cacheStats.getFieldSizeInBytes());
-				collector.recordMetric("indices.cache.filter_size", cacheStats.getFilterSizeInBytes());
+				collector.recordMetric("indices/cache/field_evictions", cacheStats.getFieldEvictions());
+				collector.recordMetric("indices/cache/filter_evictions", cacheStats.getFilterEvictions());
+				collector.recordMetric("indices/cache/filter_count", cacheStats.getFilterCount());
+				collector.recordMetric("indices/cache/field_size", cacheStats.getFieldSizeInBytes());
+				collector.recordMetric("indices/cache/filter_size", cacheStats.getFilterSizeInBytes());
 			}
 
 			if (docStats != null) {
-				collector.recordMetric("indices.doc.count", docStats.count());
-				collector.recordMetric("indices.doc.deleted", docStats.deleted());
+				collector.recordMetric("indices/doc/count", docStats.count());
+				collector.recordMetric("indices/doc/deleted", docStats.deleted());
 			}
 			if (indiceStats.store() != null) {
-				collector.recordMetric("indices.store.size", indiceStats.store().sizeInBytes());
+				collector.recordMetric("indices/store/size", indiceStats.store().sizeInBytes());
 			}
 			if (indiceStats.indexing() != null) {
-				collector.recordMetric("indices.indexing.index_total", indiceStats.indexing().total().indexCount());
-				collector.recordMetric("indices.indexing.index_time_millis", indiceStats.indexing().total().indexTimeInMillis());
-				collector.recordMetric("indices.indexing.delete_total", indiceStats.indexing().total().deleteCount());
-				collector.recordMetric("indices.indexing.delete_time_millis", indiceStats.indexing().total().deleteTimeInMillis());
+				collector.recordMetric("indices/indexing/index_total", indiceStats.indexing().total().indexCount());
+				collector.recordMetric("indices/indexing/index_time_millis", indiceStats.indexing().total().indexTimeInMillis());
+				collector.recordMetric("indices/indexing/delete_total", indiceStats.indexing().total().deleteCount());
+				collector.recordMetric("indices/indexing/delete_time_millis", indiceStats.indexing().total().deleteTimeInMillis());
 			}
 		}
 
