@@ -64,7 +64,7 @@ public class NewRelicNodeAgent {
 	private void sendData(ThreadPool threadPool) {
 		// TODO: There should be an way to get the node Id, but at construction
 		// we don't have it
-		NodesStatsResponse response = client.admin().cluster().nodesStats(new NodesStatsRequest()).actionGet();
+		NodesStatsResponse response = client.admin().cluster().nodesStats(new NodesStatsRequest().all()).actionGet();
 		NodeStats node = null;
 		for (NodeStats n : response.nodes()) {
 			if (n.node().getName().equals(this.nodeName)) {

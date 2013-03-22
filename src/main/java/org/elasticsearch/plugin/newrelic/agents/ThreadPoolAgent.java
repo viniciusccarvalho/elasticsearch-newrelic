@@ -18,6 +18,8 @@
  */
 package org.elasticsearch.plugin.newrelic.agents;
 
+import java.util.Iterator;
+
 import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
 import org.elasticsearch.threadpool.ThreadPoolStats;
 import org.elasticsearch.threadpool.ThreadPoolStats.Stats;
@@ -32,8 +34,9 @@ public class ThreadPoolAgent extends NodeAgent implements Runnable {
 	public void run() {
 		ThreadPoolStats poolStats = nodeStats.threadPool();
 		if(poolStats != null){
-			while(poolStats.iterator().hasNext()){
-				Stats stats = poolStats.iterator().next();
+			Iterator<Stats> it = poolStats.iterator();
+			while(it.hasNext()){
+				Stats stats = it.next();
 				if(stats != null){
 					collector.recordMetric("pool."+stats.getName()+".active", stats.active());
 					collector.recordMetric("pool."+stats.getName()+".queue", stats.queue());
