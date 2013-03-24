@@ -42,8 +42,8 @@ public class IndicesAgentTest {
 		
 		when(nodeStats.getIndices()).thenReturn(indicesStats);
 		
-		IndicesAgent agent = new IndicesAgent(nodeStats);
-		agent.run();
+		IndicesAgent agent = new IndicesAgent();
+		agent.execute(nodeStats);
 		Assert.assertTrue(collector.getStats().isEmpty());
 		
 	}
@@ -63,9 +63,9 @@ public class IndicesAgentTest {
 		when(searchStats.total()).thenReturn(total);
 		when(total.queryCount()).thenReturn(1L);
 		when(total.queryTimeInMillis()).thenReturn(0L);
-		IndicesAgent agent = new IndicesAgent(nodeStats);
+		IndicesAgent agent = new IndicesAgent();
 		agent.setCollector(collector);
-		agent.run();
+		agent.execute(nodeStats);
 		Assert.assertFalse(collector.getStats().isEmpty());
 	}
 	
@@ -82,9 +82,9 @@ public class IndicesAgentTest {
 		when(indicesStats.getSearch()).thenReturn(searchStats);
 		when(searchStats.total()).thenReturn(total);
 		
-		IndicesAgent agent = new IndicesAgent(nodeStats);
+		IndicesAgent agent = new IndicesAgent();
 		agent.setCollector(collector);
-		agent.run();
+		agent.execute(nodeStats);
 		Assert.assertEquals(6000.0f, collector.getStats().get("indices.search.query_per_second"));
 		Assert.assertEquals(1/6f, collector.getStats().get("indices.search,query_time_millis"));
 	}

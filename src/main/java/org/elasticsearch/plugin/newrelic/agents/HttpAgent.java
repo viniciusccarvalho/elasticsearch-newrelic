@@ -21,20 +21,17 @@ package org.elasticsearch.plugin.newrelic.agents;
 import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
 import org.elasticsearch.http.HttpStats;
 
-public class HttpAgent extends NodeAgent implements Runnable{
+public class HttpAgent extends NodeAgent{
 
-	
-	public HttpAgent(NodeStats nodeStats) {
-		super(nodeStats);
-	}
 
 	@Override
-	public void run() {
+	public void execute(NodeStats nodeStats) {
 		HttpStats httpStats = nodeStats.getHttp();
 		if(httpStats != null){
 			collector.recordMetric("http/current_open", httpStats.getServerOpen());
 			collector.recordMetric("http/total_open", httpStats.getTotalOpen());
 		}
+		
 	}
 
 }

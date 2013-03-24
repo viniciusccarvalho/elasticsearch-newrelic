@@ -24,17 +24,14 @@ import org.elasticsearch.plugin.newrelic.collector.NewRelicCollector;
 
 public abstract class NodeAgent {
 	
-	protected NodeStats nodeStats;
 	
-	protected MetricCollector collector;
+	protected MetricCollector collector = new NewRelicCollector();
 	
-	public NodeAgent(NodeStats nodeStats) {
-		this.nodeStats = nodeStats;
-		this.collector = new NewRelicCollector();
-	}
-
+	
 	public void setCollector(MetricCollector collector) {
 		this.collector = collector;
 	}
+	
+	public abstract void execute(NodeStats nodeStats);
 	
 }

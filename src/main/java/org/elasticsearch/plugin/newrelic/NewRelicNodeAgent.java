@@ -18,8 +18,8 @@
  */
 package org.elasticsearch.plugin.newrelic;
 
-import java.io.IOException;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
 import org.elasticsearch.action.admin.cluster.node.stats.NodesStatsRequest;
@@ -32,36 +32,46 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.plugin.newrelic.agents.HttpAgent;
 import org.elasticsearch.plugin.newrelic.agents.IndicesAgent;
+import org.elasticsearch.plugin.newrelic.agents.NodeAgent;
 import org.elasticsearch.plugin.newrelic.agents.ThreadPoolAgent;
 import org.elasticsearch.threadpool.ThreadPool;
 
 public class NewRelicNodeAgent {
 
 	private final Client client;
-	private final ThreadPool threadPool;
 
 	private final ESLogger logger = ESLoggerFactory.getLogger(NewRelicNodeAgent.class.getName());
 	private final String nodeName;
-	private final String clusterName;
+	private final Map<String, NodeAgent> agents;
 
 	@Inject
 	public NewRelicNodeAgent(Client client, final ThreadPool threadPool, Node node) {
 		this.client = client;
-		this.threadPool = threadPool;
 		this.nodeName = node.settings().get("name");
-		this.clusterName = node.settings().get("cluster.name");
-
-		
+		this.agents = new HashMap<String, NodeAgent>();
+		setupAgents();
 		threadPool.scheduleWithFixedDelay(new Runnable() {
 
 			public void run() {
-				sendData(threadPool);
+				sendData();
 			}
-		}, TimeValue.timeValueSeconds(10L));
+		}, TimeValue.timeValueSeconds((Long) Configuration.getInstance().get("refreshInterval")));
 
 	}
+	
+	
+	private void setupAgents() {
+		Configuration.getInstance().put("http", true);
+		Configuration.getInstance().put("indices", true);
+		Configuration.getInstance().put("pool", true);
+		Configuration.getInstance().put("refreshInterval", 10L);
+		this.agents.put("http", new HttpAgent());
+		this.agents.put("indices",new IndicesAgent());
+		this.agents.put("pool", new ThreadPoolAgent());
+		
+	}
 
-	private void sendData(ThreadPool threadPool) {
+	private void sendData() {
 		// TODO: There should be an way to get the node Id, but at construction
 		// we don't have it
 		NodesStatsResponse response = client.admin().cluster().nodesStats(new NodesStatsRequest().all()).actionGet();
@@ -73,9 +83,12 @@ public class NewRelicNodeAgent {
 			}
 		}
 		if (node != null) {
-			threadPool.generic().execute(new HttpAgent(node));
-			threadPool.generic().execute(new IndicesAgent(node));
-			threadPool.generic().execute(new ThreadPoolAgent(node));
+			for(String agent : agents.keySet()){
+				if((Boolean) Configuration.getInstance().get(agent)){
+					agents.get(agent).execute(node);
+				}
+					
+			}
 		}
 	}
 

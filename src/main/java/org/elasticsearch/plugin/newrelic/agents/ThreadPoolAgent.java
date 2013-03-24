@@ -24,14 +24,10 @@ import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
 import org.elasticsearch.threadpool.ThreadPoolStats;
 import org.elasticsearch.threadpool.ThreadPoolStats.Stats;
 
-public class ThreadPoolAgent extends NodeAgent implements Runnable {
-
-	public ThreadPoolAgent(NodeStats nodeStats) {
-		super(nodeStats);
-	}
+public class ThreadPoolAgent extends NodeAgent {
 
 	@Override
-	public void run() {
+	public void execute(NodeStats nodeStats) {
 		ThreadPoolStats poolStats = nodeStats.threadPool();
 		if(poolStats != null){
 			Iterator<Stats> it = poolStats.iterator();
@@ -44,7 +40,7 @@ public class ThreadPoolAgent extends NodeAgent implements Runnable {
 					collector.recordMetric("pool/"+stats.getName()+"/threads", stats.threads());
 				}
 			}
-		}
+		}		
 	}
 
 }

@@ -18,6 +18,8 @@
  */
 package org.elasticsearch.plugin.newrelic.agents;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
 import org.elasticsearch.index.cache.CacheStats;
 import org.elasticsearch.index.get.GetStats;
@@ -25,14 +27,18 @@ import org.elasticsearch.index.search.stats.SearchStats;
 import org.elasticsearch.index.shard.DocsStats;
 import org.elasticsearch.indices.NodeIndicesStats;
 
-public class IndicesAgent extends NodeAgent implements Runnable {
+public class IndicesAgent extends NodeAgent  {
 
-	public IndicesAgent(NodeStats nodeStats) {
-		super(nodeStats);
+	public IndicesAgent() {
+		this.fieldEvictions = new AtomicLong(Long.MAX_VALUE);
+		this.filterEvictions = new AtomicLong(Long.MAX_VALUE);
 	}
+	
+	private AtomicLong fieldEvictions;
+	private AtomicLong filterEvictions;
 
-	public void run() {
-
+	@Override
+	public void execute(NodeStats nodeStats) {
 		NodeIndicesStats indiceStats = nodeStats.getIndices();
 		if (indiceStats != null) {
 
@@ -45,14 +51,14 @@ public class IndicesAgent extends NodeAgent implements Runnable {
 				float qpms = (float) searchStats.total().getQueryCount() / Math.max(1, searchStats.total().getQueryTimeInMillis());
 				float fpms = (float) searchStats.total().getFetchCount() / Math.max(1, searchStats.total().getFetchTimeInMillis());
 				
-				collector.recordMetric("indices/search/total_query_count",searchStats.total().getQueryCount() );
-				collector.recordMetric("indices/search/total_query_time_millis",searchStats.total().getQueryTimeInMillis());
-				collector.recordMetric("indices/search/queries_per_second", qpms * 1000);
-				collector.recordMetric("indices/search/average_query_time_millis",  (qpms == 0 ? 0 : (1.0f / qpms)));
-				collector.recordMetric("indices/search/total_fetch_count",searchStats.total().getFetchCount() );
-				collector.recordMetric("indices/search/total_fetch_time_millis",searchStats.total().getFetchTimeInMillis());
-				collector.recordMetric("indices/search/fetches_per_second", fpms * 1000);
-				collector.recordMetric("indices/search/average_fetch_time_millis",  (fpms == 0 ? 0 : (1.0f / fpms)));
+				collector.recordMetric("indices/search/total",searchStats.total().getQueryCount() );
+				collector.recordMetric("indices/search/time_millis",searchStats.total().getQueryTimeInMillis());
+				collector.recordMetric("indices/search/per_second", qpms * 1000);
+				collector.recordMetric("indices/search/average_time_millis",  (qpms == 0 ? 0 : (1.0f / qpms)));
+				collector.recordMetric("indices/fetch/total",searchStats.total().getFetchCount() );
+				collector.recordMetric("indices/fetch/time_millis",searchStats.total().getFetchTimeInMillis());
+				collector.recordMetric("indices/fetch/per_second", fpms * 1000);
+				collector.recordMetric("indices/fetch/average_time_millis",  (fpms == 0 ? 0 : (1.0f / fpms)));
 				
 			}
 
@@ -64,16 +70,23 @@ public class IndicesAgent extends NodeAgent implements Runnable {
 				
 				collector.recordMetric("indices/get/exists", getStats.existsCount());
 				collector.recordMetric("indices/get/missing", getStats.missingCount());
-				collector.recordMetric("indices/get/gets_per_second", gpms * 1000);
+				collector.recordMetric("indices/get/per_second", gpms * 1000);
 				collector.recordMetric("indices/get/average_time_millis", (gpms == 0 ? 0 : (1.0f / gpms)));
 			}
 
 			if (cacheStats != null) {
-				collector.recordMetric("indices/cache/field_evictions", cacheStats.getFieldEvictions());
-				collector.recordMetric("indices/cache/filter_evictions", cacheStats.getFilterEvictions());
+				
+				if((cacheStats.getFieldEvictions() - fieldEvictions.get()) >= 0){
+					collector.recordMetric("indices/cache/field_evictions", (cacheStats.getFieldEvictions() - fieldEvictions.get()));
+				}
+				if((cacheStats.getFilterEvictions() - filterEvictions.get()) >= 0){
+					collector.recordMetric("indices/cache/field_evictions", (cacheStats.getFilterEvictions() - filterEvictions.get()));
+				}
 				collector.recordMetric("indices/cache/filter_count", cacheStats.getFilterCount());
 				collector.recordMetric("indices/cache/field_size", cacheStats.getFieldSizeInBytes());
 				collector.recordMetric("indices/cache/filter_size", cacheStats.getFilterSizeInBytes());
+				fieldEvictions.set(cacheStats.getFieldEvictions());
+				filterEvictions.set(cacheStats.getFilterEvictions());
 			}
 
 			if (docStats != null) {
@@ -84,13 +97,12 @@ public class IndicesAgent extends NodeAgent implements Runnable {
 				collector.recordMetric("indices/store/size", indiceStats.store().sizeInBytes());
 			}
 			if (indiceStats.indexing() != null) {
-				collector.recordMetric("indices/indexing/index_total", indiceStats.indexing().total().indexCount());
-				collector.recordMetric("indices/indexing/index_time_millis", indiceStats.indexing().total().indexTimeInMillis());
-				collector.recordMetric("indices/indexing/delete_total", indiceStats.indexing().total().deleteCount());
-				collector.recordMetric("indices/indexing/delete_time_millis", indiceStats.indexing().total().deleteTimeInMillis());
+				collector.recordMetric("indices/indexing/total", indiceStats.indexing().total().indexCount());
+				collector.recordMetric("indices/indexing/time_millis", indiceStats.indexing().total().indexTimeInMillis());
+				collector.recordMetric("indices/delete/total", indiceStats.indexing().total().deleteCount());
+				collector.recordMetric("indices/delete/time_millis", indiceStats.indexing().total().deleteTimeInMillis());
 			}
-		}
-
+		}		
 	}
 
 }
