@@ -3,6 +3,7 @@ package org.elasticsearch.plugin.newrelic;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Configuration {
 	
@@ -11,7 +12,7 @@ public class Configuration {
 	private static Configuration instance;
 	
 	private Configuration(){
-		this.data = Collections.synchronizedMap(new HashMap<String, Object>());
+		this.data = new ConcurrentHashMap<String, Object>();
 	}
 
 	public static Configuration getInstance(){
