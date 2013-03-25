@@ -20,6 +20,7 @@
 package org.elasticsearch.plugin.newrelic;
 
 import org.elasticsearch.common.inject.AbstractModule;
+import org.elasticsearch.plugin.newrelic.rest.action.NewRelicAction;
 
 public class NewRelicModule extends AbstractModule {
 
@@ -27,6 +28,7 @@ public class NewRelicModule extends AbstractModule {
 	protected void configure() {
 		bind(NewRelicNodeAgent.class).asEagerSingleton();
 		bind(Configuration.class).asEagerSingleton();
+		bind(NewRelicAction.class).asEagerSingleton();
 	}
 
 }
