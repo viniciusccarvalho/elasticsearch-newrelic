@@ -31,6 +31,10 @@ public class Configuration {
 	public Object put(String key, Object value) {
 		return data.put(key, value);
 	}
+
+	public Map<String, Object> getData() {
+		return Collections.unmodifiableMap(data);
+	}
 	
 	
 }
