@@ -44,5 +44,15 @@ You can also set each parameter individually by issuing a POST:
 
     curl -XPOST "http://localhost:9200/_newrelic?http=false&pool=false&refreshInterval=5"
 
+Metrics:
+--------
+
+The plugin collects six main categories: indices, pool, network, transport, http and filesystem. The metrics are created
+using newrelic hierarchical approach, so for example:
+
+indices/search/total --> Total number of searches executed
+
+This way, once you are on your custom dashboard, you can benefit from the auto complete feature by just typing the name
+of the main category followed by a / : 
 
 
