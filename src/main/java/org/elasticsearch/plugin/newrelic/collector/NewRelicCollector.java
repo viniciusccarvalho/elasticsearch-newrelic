@@ -18,13 +18,19 @@
  */
 package org.elasticsearch.plugin.newrelic.collector;
 
+import org.elasticsearch.common.logging.ESLogger;
+import org.elasticsearch.common.logging.ESLoggerFactory;
+
 import com.newrelic.api.agent.NewRelic;
 
 public class NewRelicCollector implements MetricCollector {
 
+	private ESLogger logger = ESLoggerFactory.getLogger(NewRelicCollector.class.getName());
+	
 	@Override
 	public void recordMetric(String name, Number value) {
 		if(value != null){
+			logger.debug("Pushing metric [{}:{}]", name, value.floatValue());
 			NewRelic.recordMetric(name, value.floatValue());
 		}
 	}
