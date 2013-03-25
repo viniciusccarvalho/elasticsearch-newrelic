@@ -40,7 +40,7 @@ There's an endpoint _newrelic that will return the configuration using GET:
      "network" : true
     }
     
-You can also set each parameter individually by issueing a POST:
+You can also set each parameter individually by issuing a POST:
 
     curl -XPOST "http://localhost:9200/_newrelic?http=false&pool=false&refreshInterval=5"
 
