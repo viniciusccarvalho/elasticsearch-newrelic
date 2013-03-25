@@ -1,4 +1,7 @@
 elasticsearch-newrelic
 ======================
 
-River to dump elasticsearch metrics into newrelic using newrelic's client api
+Plugin to export Node stats to newrelic.
+
+Installation:
+=============
