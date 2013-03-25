@@ -27,7 +27,6 @@ public class NewRelicModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind(NewRelicNodeAgent.class).asEagerSingleton();
-		bind(Configuration.class).asEagerSingleton();
 		bind(NewRelicAction.class).asEagerSingleton();
 	}
 

@@ -46,12 +46,12 @@ public class NewRelicAction extends BaseRestHandler {
 		try {
 			XContentBuilder builder = RestXContentBuilder.restContentBuilder(request);
 			builder.startObject();
-			builder.startObject();
+				builder.field("configuration");
 				builder.map(Configuration.getInstance().getData());
 			builder.endObject();
 			channel.sendResponse(new XContentRestResponse(request, RestStatus.OK, builder));
 		} catch (Exception e) {
-			// TODO: handle exception
+			e.printStackTrace();
 		}
 	}
 	
