@@ -41,7 +41,7 @@ public class IndicesAgent extends NodeAgent  {
 	public void execute(NodeStats nodeStats) {
 		NodeIndicesStats indiceStats = nodeStats.getIndices();
 		if (indiceStats != null) {
-
+			logger.debug("Running IndicesAgent");
 			SearchStats searchStats = indiceStats.getSearch();
 			GetStats getStats = indiceStats.get();
 			CacheStats cacheStats = indiceStats.cache();
@@ -103,6 +103,11 @@ public class IndicesAgent extends NodeAgent  {
 				collector.recordMetric("indices/delete/time_millis", indiceStats.indexing().total().deleteTimeInMillis());
 			}
 		}		
+	}
+
+	@Override
+	public String getName() {
+		return "indices";
 	}
 
 }

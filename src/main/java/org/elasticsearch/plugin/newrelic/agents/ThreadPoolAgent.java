@@ -30,6 +30,7 @@ public class ThreadPoolAgent extends NodeAgent {
 	public void execute(NodeStats nodeStats) {
 		ThreadPoolStats poolStats = nodeStats.threadPool();
 		if(poolStats != null){
+			logger.debug("Running ThreadPoolAgent");
 			Iterator<Stats> it = poolStats.iterator();
 			while(it.hasNext()){
 				Stats stats = it.next();
@@ -41,6 +42,11 @@ public class ThreadPoolAgent extends NodeAgent {
 				}
 			}
 		}		
+	}
+
+	@Override
+	public String getName() {
+		return "pool";
 	}
 
 }

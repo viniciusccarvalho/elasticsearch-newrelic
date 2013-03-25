@@ -19,25 +19,29 @@
 package org.elasticsearch.plugin.newrelic.agents;
 
 import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
-import org.elasticsearch.http.HttpStats;
+import org.elasticsearch.transport.TransportStats;
 
-public class HttpAgent extends NodeAgent{
-
+public class TransportAgent extends NodeAgent {
 
 	@Override
 	public void execute(NodeStats nodeStats) {
-		HttpStats httpStats = nodeStats.getHttp();
-		if(httpStats != null){
-			logger.debug("Running HttpAgent");
-			collector.recordMetric("http/current_open", httpStats.getServerOpen());
-			collector.recordMetric("http/total_open", httpStats.getTotalOpen());
-		}
+		TransportStats transportStats = nodeStats.getTransport();
 		
+		if(transportStats != null){
+			logger.debug("Running TransportAgent");
+			collector.recordMetric("transport/rx/count", transportStats.rxCount());
+			collector.recordMetric("transport/rx/size", transportStats.rxSize().bytes());
+			collector.recordMetric("transport/rx/averageSize", (float)transportStats.rxSize().bytes()/Math.max(1.0, transportStats.rxCount()));
+			collector.recordMetric("transport/tx/count", transportStats.getTxCount());
+			collector.recordMetric("transport/tx/size", transportStats.txSize().bytes());
+			collector.recordMetric("transport/tx/averageSize", (float)transportStats.txSize().bytes()/Math.max(1.0, transportStats.txCount()));
+			collector.recordMetric("transport/open", transportStats.serverOpen());
+		}
 	}
 
 	@Override
 	public String getName() {
-		return "http";
+		return "transport";
 	}
 
 }

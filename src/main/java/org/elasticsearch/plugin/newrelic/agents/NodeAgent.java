@@ -18,15 +18,21 @@
  */
 package org.elasticsearch.plugin.newrelic.agents;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
+import org.elasticsearch.common.logging.ESLogger;
+import org.elasticsearch.common.logging.ESLoggerFactory;
 import org.elasticsearch.plugin.newrelic.collector.MetricCollector;
 import org.elasticsearch.plugin.newrelic.collector.NewRelicCollector;
 
 public abstract class NodeAgent {
 	
+	protected ESLogger logger = ESLoggerFactory.getLogger(this.getClass().getName());
 	
 	protected MetricCollector collector = new NewRelicCollector();
 	
+	protected AtomicBoolean enabled = new AtomicBoolean(true);
 	
 	public void setCollector(MetricCollector collector) {
 		this.collector = collector;
@@ -34,4 +40,14 @@ public abstract class NodeAgent {
 	
 	public abstract void execute(NodeStats nodeStats);
 	
+	public abstract String getName();
+	
+	public Boolean isEnabled(){
+		return enabled.get();
+	}
+	
+	
+	public void setEnabled(Boolean bool){
+		enabled.set(bool);
+	}
 }

@@ -30,10 +30,13 @@ import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.logging.ESLoggerFactory;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.node.Node;
+import org.elasticsearch.plugin.newrelic.agents.FileSystemAgent;
 import org.elasticsearch.plugin.newrelic.agents.HttpAgent;
 import org.elasticsearch.plugin.newrelic.agents.IndicesAgent;
+import org.elasticsearch.plugin.newrelic.agents.NetworkAgent;
 import org.elasticsearch.plugin.newrelic.agents.NodeAgent;
 import org.elasticsearch.plugin.newrelic.agents.ThreadPoolAgent;
+import org.elasticsearch.plugin.newrelic.agents.TransportAgent;
 import org.elasticsearch.threadpool.ThreadPool;
 
 public class NewRelicNodeAgent {
@@ -42,32 +45,39 @@ public class NewRelicNodeAgent {
 
 	private final ESLogger logger = ESLoggerFactory.getLogger(NewRelicNodeAgent.class.getName());
 	private final String nodeName;
-	private final Map<String, NodeAgent> agents;
+	private final Map<String,NodeAgent> agents;
+	private ThreadPool threadPool;
 
 	@Inject
 	public NewRelicNodeAgent(Client client, final ThreadPool threadPool, Node node) {
+		logger.info("Starting new relic agent"); 
 		this.client = client;
 		this.nodeName = node.settings().get("name");
-		this.agents = new HashMap<String, NodeAgent>();
+		this.agents = new HashMap<String,NodeAgent>();
+		this.threadPool = threadPool;
 		setupAgents();
-		threadPool.scheduleWithFixedDelay(new Runnable() {
-
-			public void run() {
-				sendData();
-			}
-		}, TimeValue.timeValueSeconds((Long) Configuration.getInstance().get("refreshInterval")));
-
+		schedule();
 	}
 	
 	
 	private void setupAgents() {
-		Configuration.getInstance().put("http", true);
-		Configuration.getInstance().put("indices", true);
-		Configuration.getInstance().put("pool", true);
+		HttpAgent http = new HttpAgent();
+		IndicesAgent indices = new IndicesAgent();
+		ThreadPoolAgent pool = new ThreadPoolAgent();
+		TransportAgent transport = new TransportAgent();
+		NetworkAgent network = new NetworkAgent();
+		FileSystemAgent fs = new FileSystemAgent();
+		
 		Configuration.getInstance().put("refreshInterval", 10L);
-		this.agents.put("http", new HttpAgent());
-		this.agents.put("indices",new IndicesAgent());
-		this.agents.put("pool", new ThreadPoolAgent());
+		
+		synchronized (this.agents) {
+			this.agents.put(http.getName(),http);
+			this.agents.put(indices.getName(),indices);
+			this.agents.put(pool.getName(),pool);
+			this.agents.put(network.getName(),network);
+			this.agents.put(transport.getName(),transport);
+			this.agents.put(fs.getName(), fs);
+		}
 		
 	}
 
@@ -83,13 +93,41 @@ public class NewRelicNodeAgent {
 			}
 		}
 		if (node != null) {
-			for(String agent : agents.keySet()){
-				if((Boolean) Configuration.getInstance().get(agent)){
-					agents.get(agent).execute(node);
+			for(NodeAgent agent : agents.values()){
+				if(agent.isEnabled()){
+					agent.execute(node);
 				}
-					
+			}
+		}
+		schedule();
+	}
+	
+	
+	private void schedule(){
+		
+		
+		threadPool.schedule(TimeValue.timeValueSeconds((Long) Configuration.getInstance().get("refreshInterval")), "generic", new Runnable() {
+			public void run() {
+				sendData();
+			}
+		});
+	}
+	
+	public Map<String,Boolean> agentState(){
+		Map<String,Boolean> state = new HashMap<String, Boolean>();
+		synchronized (this.agents) {
+			for(NodeAgent agent : agents.values()){
+				state.put(agent.getName(), agent.isEnabled());
+			}
+		}
+		return state;
+	}
+	
+	public void setState(String agentName, Boolean state){
+		synchronized (this.agents) {
+			if(this.agents.get(agentName) != null){
+				this.agents.get(agentName).setEnabled(state);
 			}
 		}
 	}
-
 }
