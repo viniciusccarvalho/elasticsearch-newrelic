@@ -31,18 +31,28 @@ Configuration:
 There's an endpoint _newrelic that will return the configuration using GET:
 
     curl -XGET http://localhost:9200/_newrelic?pretty
-    {
-     "configuration" : {
-     "indices" : true,
-     "refreshInterval" : 10,
-     "pool" : true,
-     "http" : true,
-     "network" : true
-    }
+     {
+      "configuration" : {
+        "agents" : {
+          "http" : true,
+          "pool" : true,
+          "transport" : true,
+          "fs" : true,
+          "indices" : true,
+          "network" : true
+        },
+        "refreshInterval" : 10
+       }
+      }
     
 You can also set each parameter individually by issuing a POST:
 
     curl -XPOST "http://localhost:9200/_newrelic?http=false&pool=false&refreshInterval=5"
+    
+Or set all to be on/off by issuing:
+
+    curl -XPOST "http://localhost:9200/_newrelic?all=false"
+
 
 Metrics:
 --------
