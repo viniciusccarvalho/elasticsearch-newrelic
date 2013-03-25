@@ -56,7 +56,21 @@ public class NewRelicAction extends BaseRestHandler {
 	}
 	
 	public void handlePost(RestRequest request, RestChannel channel) {
+		if(request.param("http") != null)
+			Configuration.getInstance().put("http", request.paramAsBoolean("http", Boolean.FALSE));
+		if(request.param("pool") != null)
+			Configuration.getInstance().put("pool", request.paramAsBoolean("pool", Boolean.FALSE));
+		if(request.param("indices") != null)
+			Configuration.getInstance().put("indices", request.paramAsBoolean("indices", Boolean.FALSE));
+		if(request.param("refreshInterval") != null)
+			Configuration.getInstance().put("refreshInterval", request.paramAsLong("refreshInterval", 10L));
 		
+		try {
+			XContentBuilder builder = RestXContentBuilder.restContentBuilder(request);
+			channel.sendResponse(new XContentRestResponse(request, RestStatus.OK, builder));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 }
