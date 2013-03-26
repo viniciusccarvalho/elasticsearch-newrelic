@@ -4,6 +4,7 @@ apply plugin:'application'
 
 
 sourceCompatibility = 1.6
+version = '0.0.1'
 
 repositories {
     mavenCentral()
