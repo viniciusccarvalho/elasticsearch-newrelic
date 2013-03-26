@@ -65,4 +65,8 @@ indices/search/total --> Total number of searches executed
 This way, once you are on your custom dashboard, you can benefit from the auto complete feature by just typing the name
 of the main category followed by a / : 
 
+![Metrics screen](/../../../raw/master/site/metric_selection.png)
 
+Screenshots:
+-----------
+![Sample dashboard](/../../../raw/master/site/es_dashboard.png)
