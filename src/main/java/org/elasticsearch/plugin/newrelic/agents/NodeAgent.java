@@ -18,6 +18,8 @@
  */
 package org.elasticsearch.plugin.newrelic.agents;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
@@ -25,6 +27,7 @@ import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.logging.ESLoggerFactory;
 import org.elasticsearch.plugin.newrelic.collector.MetricCollector;
 import org.elasticsearch.plugin.newrelic.collector.NewRelicCollector;
+import org.elasticsearch.plugin.newrelic.model.Metric;
 
 public abstract class NodeAgent {
 	
@@ -33,6 +36,8 @@ public abstract class NodeAgent {
 	protected MetricCollector collector = new NewRelicCollector();
 	
 	protected AtomicBoolean enabled = new AtomicBoolean(true);
+	
+	protected Map<String, Metric> metrics = new HashMap<String, Metric>();
 	
 	public void setCollector(MetricCollector collector) {
 		this.collector = collector;
