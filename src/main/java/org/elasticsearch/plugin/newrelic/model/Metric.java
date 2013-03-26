@@ -29,50 +29,53 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Metric {
 	
-	private Double current;
-	private Double last;
+	private Number current;
+	private Number last;
 	private final boolean delta;
-	private Double min;
-	private Double max;
+	private Number min;
+	private Number max;
 	private Lock lock = new ReentrantLock();
+	private final String name;
 	
-	public Metric(){
-		this(0.0);
+	public Metric(String name){
+		this(0.0,name);
 	}
 	
-	public Metric (Double current){
-		this(current,false);
+	public Metric (Number current, String name){
+		this(current,false,name);
 	}
 	
-	public Metric(Double current, boolean delta) {
+	public Metric(Number current, boolean delta, String name) {
 		this.current = current;
 		this.delta = delta;
 		this.min = current;
 		this.max = current;
+		this.name = name;
 	}
 
-	public void refresh(Double value){
+	public Metric refresh(Number value){
 		try {
 			lock.lock();
 			last = current;
 			current = value;
-			if(value < min)
+			if(value.doubleValue() < min.doubleValue())
 				min = value;
-			if(value > max)
+			if(value.doubleValue() > max.doubleValue())
 				max = value;
 		} catch (Exception e) {
 			// TODO: handle exception
 		}finally {
 			lock.unlock();
 		}
+		return this;
 	}
 	
-	public Double getValue(){
-		Double value = null;
+	public Number getValue(){
+		Number value = null;
 		try {
 			lock.lock();
 			if(delta){
-				value = (last == null) ? null : current-last;
+				value = (last == null) ? null : current.doubleValue()-last.doubleValue();
 			}else{
 				value = current;
 			}
@@ -99,6 +102,10 @@ public class Metric {
 			lock.unlock();
 		}
 		return values;
+	}
+
+	public String getName() {
+		return name;
 	}
 	
 }

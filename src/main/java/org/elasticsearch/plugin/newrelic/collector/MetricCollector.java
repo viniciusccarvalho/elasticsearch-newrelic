@@ -18,6 +18,8 @@
  */
 package org.elasticsearch.plugin.newrelic.collector;
 
+import org.elasticsearch.plugin.newrelic.model.Metric;
+
 /**
  * 
  * @author vinicius
@@ -28,6 +30,8 @@ package org.elasticsearch.plugin.newrelic.collector;
 public interface MetricCollector {
 	
 	public void recordMetric(String name, Number value);
+	public void recordMetric(Metric metric);
+	
 	public void recordResponseTimeMetric(String name, long millis);
 	
 }

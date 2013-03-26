@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.elasticsearch.plugin.newrelic.collector.MetricCollector;
+import org.elasticsearch.plugin.newrelic.model.Metric;
 
 public class MapCollector implements MetricCollector{
 	
@@ -41,6 +42,13 @@ public class MapCollector implements MetricCollector{
 
 	public Map<String, Number> getStats() {
 		return stats;
+	}
+
+	@Override
+	public void recordMetric(Metric metric) {
+		if(metric.getValue() != null)
+			stats.put(metric.getName(), metric.getValue());
+		
 	}
 
 }

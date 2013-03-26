@@ -27,7 +27,7 @@ public class MetricTest {
 	
 	@Test
 	public void simpleMetric(){
-		Metric m = new Metric();
+		Metric m = new Metric("indices/search/test");
 		m.refresh(1.0);
 		Assert.assertEquals(1.0, m.getValue());
 		m.refresh(2.0);
@@ -36,7 +36,7 @@ public class MetricTest {
 	
 	@Test
 	public void deltaMetric(){
-		Metric m = new Metric(1.0,true);
+		Metric m = new Metric(1.0,true,"indices/search/test");
 		Assert.assertEquals(null, m.getValue());
 		m.refresh(3.0);
 		Assert.assertEquals(2.0, m.getValue());
@@ -44,7 +44,7 @@ public class MetricTest {
 	
 	@Test
 	public void deltaMetricValues(){
-		Metric m = new Metric(1.0,true);
+		Metric m = new Metric(1.0,true,"indices/search/test");
 		Assert.assertEquals(null, m.getValue());
 		m.refresh(3.0);
 		Assert.assertEquals(2.0, m.getValue());

@@ -20,6 +20,7 @@ package org.elasticsearch.plugin.newrelic.collector;
 
 import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.logging.ESLoggerFactory;
+import org.elasticsearch.plugin.newrelic.model.Metric;
 
 import com.newrelic.api.agent.NewRelic;
 
@@ -40,4 +41,12 @@ public class NewRelicCollector implements MetricCollector {
 		NewRelic.recordResponseTimeMetric(name, millis);
 	}
 
+	@Override
+	public void recordMetric(Metric metric) {
+		if(metric.getValue() != null){
+			NewRelic.recordMetric(metric.getName(), metric.getValue().floatValue());
+		}
+	}
+
+	
 }
