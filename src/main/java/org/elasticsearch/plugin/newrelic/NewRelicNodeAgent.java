@@ -18,6 +18,8 @@
  */
 package org.elasticsearch.plugin.newrelic;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +39,7 @@ import org.elasticsearch.plugin.newrelic.agents.NetworkAgent;
 import org.elasticsearch.plugin.newrelic.agents.NodeAgent;
 import org.elasticsearch.plugin.newrelic.agents.ThreadPoolAgent;
 import org.elasticsearch.plugin.newrelic.agents.TransportAgent;
+import org.elasticsearch.plugin.newrelic.model.Metric;
 import org.elasticsearch.threadpool.ThreadPool;
 
 public class NewRelicNodeAgent {
@@ -121,6 +124,18 @@ public class NewRelicNodeAgent {
 			}
 		}
 		return state;
+	}
+	
+	public Map<String,Object> stats() {
+		Map<String, Object> stats = new HashMap<String, Object>();
+		for(NodeAgent agent : agents.values()){
+			Map<String,Object> stat = new HashMap<String, Object>();
+			stat.put("enabled", agent.isEnabled());
+			stat.put("metrics", new ArrayList<Metric>(agent.getMetrics().values()).toArray(new Metric[]{null}));
+			stats.put(agent.getName(), stat);
+		}
+		
+		return stats;
 	}
 	
 	public void setState(String agentName, Boolean state){

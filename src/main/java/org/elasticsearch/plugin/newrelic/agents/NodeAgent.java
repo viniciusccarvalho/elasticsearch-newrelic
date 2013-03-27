@@ -18,6 +18,7 @@
  */
 package org.elasticsearch.plugin.newrelic.agents;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -51,6 +52,9 @@ public abstract class NodeAgent {
 		return enabled.get();
 	}
 	
+	public Map<String,Metric> getMetrics(){
+		return Collections.unmodifiableMap(metrics);
+	}
 	
 	public void setEnabled(Boolean bool){
 		enabled.set(bool);
