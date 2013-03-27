@@ -19,23 +19,31 @@
 package org.elasticsearch.plugin.newrelic.agents;
 
 import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
+import org.elasticsearch.plugin.newrelic.model.Metric;
 import org.elasticsearch.transport.TransportStats;
 
 public class TransportAgent extends NodeAgent {
-
+	
+	public TransportAgent() {
+		metrics.put("transport/rx/count",new Metric(0.0,true,"transport/rx/count"));
+		metrics.put("transport/rx/size",new Metric(0.0,true,"transport/rx/size"));
+		metrics.put("transport/tx/count",new Metric(0.0,true,"transport/tx/count"));
+		metrics.put("transport/tx/size",new Metric(0.0,true,"transport/tx/size"));
+		metrics.put("transport/open",new Metric("transport/tx/size"));
+		
+	}
+	
 	@Override
 	public void execute(NodeStats nodeStats) {
 		TransportStats transportStats = nodeStats.getTransport();
 		
 		if(transportStats != null){
 			logger.debug("Running TransportAgent");
-			collector.recordMetric("transport/rx/count", transportStats.rxCount());
-			collector.recordMetric("transport/rx/size", transportStats.rxSize().bytes());
-			collector.recordMetric("transport/rx/averageSize", (float)transportStats.rxSize().bytes()/Math.max(1.0, transportStats.rxCount()));
-			collector.recordMetric("transport/tx/count", transportStats.getTxCount());
-			collector.recordMetric("transport/tx/size", transportStats.txSize().bytes());
-			collector.recordMetric("transport/tx/averageSize", (float)transportStats.txSize().bytes()/Math.max(1.0, transportStats.txCount()));
-			collector.recordMetric("transport/open", transportStats.serverOpen());
+			collector.recordMetric(metrics.get("transport/rx/count").refresh( transportStats.rxCount()));
+			collector.recordMetric(metrics.get("transport/rx/size").refresh( transportStats.rxSize().bytes()));
+			collector.recordMetric(metrics.get("transport/tx/count").refresh( transportStats.getTxCount()));
+			collector.recordMetric(metrics.get("transport/tx/size").refresh( transportStats.txSize().bytes()));
+			collector.recordMetric(metrics.get("transport/open").refresh( transportStats.serverOpen()));
 		}
 	}
 

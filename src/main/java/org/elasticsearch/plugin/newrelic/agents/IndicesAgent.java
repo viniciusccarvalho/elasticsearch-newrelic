@@ -18,24 +18,40 @@
  */
 package org.elasticsearch.plugin.newrelic.agents;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
 import org.elasticsearch.index.cache.CacheStats;
 import org.elasticsearch.index.get.GetStats;
 import org.elasticsearch.index.search.stats.SearchStats;
 import org.elasticsearch.index.shard.DocsStats;
 import org.elasticsearch.indices.NodeIndicesStats;
+import org.elasticsearch.plugin.newrelic.model.Metric;
 
 public class IndicesAgent extends NodeAgent  {
 
 	public IndicesAgent() {
-		this.fieldEvictions = new AtomicLong(Long.MAX_VALUE);
-		this.filterEvictions = new AtomicLong(Long.MAX_VALUE);
+		
+		metrics.put("indices/search/total",new Metric("indices/search/total"));
+		metrics.put("indices/search/time_millis",new Metric(0.0,true,"indices/search/time_millis"));
+		metrics.put("indices/fetch/total",new Metric("indices/fetch/total"));
+		metrics.put("indices/fetch/time_millis",new Metric(0.0,true,"indices/fetch/time_millis"));
+		metrics.put("indices/get/total",new Metric("indices/get/total"));
+		metrics.put("indices/get/time_millis",new Metric(0.0,true,"indices/get/time_millis"));
+		metrics.put("indices/get/exists",new Metric(0.0,true,"indices/get/exists"));
+		metrics.put("indices/get/missing",new Metric(0.0,true,"indices/get/missing"));
+		metrics.put("indices/cache/filter_count",new Metric("indices/cache/filter_count"));
+		metrics.put("indices/cache/filter_size",new Metric("indices/cache/filter_size"));
+		metrics.put("indices/cache/field_size",new Metric("indices/cache/field_size"));
+		metrics.put("indices/cache/field_evictions",new Metric(0.0,true,"indices/cache/field_evictions"));
+		metrics.put("indices/cache/filter_evictions",new Metric(0.0,true,"indices/cache/filter_evictions"));
+		metrics.put("indices/doc/total",new Metric("indices/doc/total"));
+		metrics.put("indices/doc/deleted",new Metric("indices/doc/deleted"));
+		metrics.put("indices/store/size",new Metric("indices/store/size"));
+		metrics.put("indices/indexing/total",new Metric(0.0,true,"indices/indexing/total"));
+		metrics.put("indices/indexing/time_millis",new Metric(0.0,true,"indices/indexing/time_millis"));
+		metrics.put("indices/delete/total",new Metric(0.0,true,"indices/delete/total"));
+		metrics.put("indices/delete/time_millis",new Metric(0.0,true,"indices/delete/time_millis"));
 	}
 	
-	private AtomicLong fieldEvictions;
-	private AtomicLong filterEvictions;
 
 	@Override
 	public void execute(NodeStats nodeStats) {
@@ -48,59 +64,36 @@ public class IndicesAgent extends NodeAgent  {
 			DocsStats docStats = indiceStats.docs();
 
 			if (searchStats != null) {
-				float qpms = (float) searchStats.total().getQueryCount() / Math.max(1, searchStats.total().getQueryTimeInMillis());
-				float fpms = (float) searchStats.total().getFetchCount() / Math.max(1, searchStats.total().getFetchTimeInMillis());
-				
-				collector.recordMetric("indices/search/total",searchStats.total().getQueryCount() );
-				collector.recordMetric("indices/search/time_millis",searchStats.total().getQueryTimeInMillis());
-				collector.recordMetric("indices/search/per_second", qpms * 1000);
-				collector.recordMetric("indices/search/average_time_millis",  (qpms == 0 ? 0 : (1.0f / qpms)));
-				collector.recordMetric("indices/fetch/total",searchStats.total().getFetchCount() );
-				collector.recordMetric("indices/fetch/time_millis",searchStats.total().getFetchTimeInMillis());
-				collector.recordMetric("indices/fetch/per_second", fpms * 1000);
-				collector.recordMetric("indices/fetch/average_time_millis",  (fpms == 0 ? 0 : (1.0f / fpms)));
-				
+				collector.recordMetric(metrics.get("indices/search/total").refresh(searchStats.total().getQueryCount() ));
+				collector.recordMetric(metrics.get("indices/search/time_millis").refresh(searchStats.total().getQueryTimeInMillis()));
+				collector.recordMetric(metrics.get("indices/fetch/total").refresh(searchStats.total().getFetchCount()) );
+				collector.recordMetric(metrics.get("indices/fetch/time_millis").refresh(searchStats.total().getFetchTimeInMillis()));
 			}
-
 			if (getStats != null) {
-				float gpms = (float) indiceStats.get().getCount() / Math.max(1, indiceStats.get().getTimeInMillis());
-				
-				collector.recordMetric("indices/get/total",getStats.count() );
-				collector.recordMetric("indices/get/time_millis",getStats.getTimeInMillis());
-				
-				collector.recordMetric("indices/get/exists", getStats.existsCount());
-				collector.recordMetric("indices/get/missing", getStats.missingCount());
-				collector.recordMetric("indices/get/per_second", gpms * 1000);
-				collector.recordMetric("indices/get/average_time_millis", (gpms == 0 ? 0 : (1.0f / gpms)));
+				collector.recordMetric(metrics.get("indices/get/total").refresh(getStats.count()));
+				collector.recordMetric(metrics.get("indices/get/time_millis").refresh(getStats.getTimeInMillis()));
+				collector.recordMetric(metrics.get("indices/get/exists").refresh( getStats.existsCount()));
+				collector.recordMetric(metrics.get("indices/get/missing").refresh( getStats.missingCount()));
 			}
-
 			if (cacheStats != null) {
-				
-				if((cacheStats.getFieldEvictions() - fieldEvictions.get()) >= 0){
-					collector.recordMetric("indices/cache/field_evictions", (cacheStats.getFieldEvictions() - fieldEvictions.get()));
-				}
-				if((cacheStats.getFilterEvictions() - filterEvictions.get()) >= 0){
-					collector.recordMetric("indices/cache/field_evictions", (cacheStats.getFilterEvictions() - filterEvictions.get()));
-				}
-				collector.recordMetric("indices/cache/filter_count", cacheStats.getFilterCount());
-				collector.recordMetric("indices/cache/field_size", cacheStats.getFieldSizeInBytes());
-				collector.recordMetric("indices/cache/filter_size", cacheStats.getFilterSizeInBytes());
-				fieldEvictions.set(cacheStats.getFieldEvictions());
-				filterEvictions.set(cacheStats.getFilterEvictions());
+				collector.recordMetric(metrics.get("indices/cache/field_evictions").refresh(cacheStats.getFieldEvictions()));
+				collector.recordMetric(metrics.get("indices/cache/field_evictions").refresh( cacheStats.getFilterEvictions()));
+				collector.recordMetric(metrics.get("indices/cache/filter_count").refresh( cacheStats.getFilterCount()));
+				collector.recordMetric(metrics.get("indices/cache/field_size").refresh( cacheStats.getFieldSizeInBytes()));
+				collector.recordMetric(metrics.get("indices/cache/filter_size").refresh( cacheStats.getFilterSizeInBytes()));
 			}
-
 			if (docStats != null) {
-				collector.recordMetric("indices/doc/count", docStats.count());
-				collector.recordMetric("indices/doc/deleted", docStats.deleted());
+				collector.recordMetric(metrics.get("indices/doc/count").refresh( docStats.count()));
+				collector.recordMetric(metrics.get("indices/doc/deleted").refresh( docStats.deleted()));
 			}
 			if (indiceStats.store() != null) {
-				collector.recordMetric("indices/store/size", indiceStats.store().sizeInBytes());
+				collector.recordMetric(metrics.get("indices/store/size").refresh( indiceStats.store().sizeInBytes()));
 			}
 			if (indiceStats.indexing() != null) {
-				collector.recordMetric("indices/indexing/total", indiceStats.indexing().total().indexCount());
-				collector.recordMetric("indices/indexing/time_millis", indiceStats.indexing().total().indexTimeInMillis());
-				collector.recordMetric("indices/delete/total", indiceStats.indexing().total().deleteCount());
-				collector.recordMetric("indices/delete/time_millis", indiceStats.indexing().total().deleteTimeInMillis());
+				collector.recordMetric(metrics.get("indices/indexing/total").refresh( indiceStats.indexing().total().indexCount()));
+				collector.recordMetric(metrics.get("indices/indexing/time_millis").refresh( indiceStats.indexing().total().indexTimeInMillis()));
+				collector.recordMetric(metrics.get("indices/delete/total").refresh( indiceStats.indexing().total().deleteCount()));
+				collector.recordMetric(metrics.get("indices/delete/time_millis").refresh( indiceStats.indexing().total().deleteTimeInMillis()));
 			}
 		}		
 	}

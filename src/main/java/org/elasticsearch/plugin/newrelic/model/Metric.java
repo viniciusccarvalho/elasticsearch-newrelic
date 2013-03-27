@@ -36,6 +36,7 @@ public class Metric {
 	private Number max;
 	private Lock lock = new ReentrantLock();
 	private final String name;
+	private Long lastUpdated;
 	
 	public Metric(String name){
 		this(0.0,name);
@@ -51,11 +52,13 @@ public class Metric {
 		this.min = current;
 		this.max = current;
 		this.name = name;
+		this.lastUpdated = System.currentTimeMillis();
 	}
 
 	public Metric refresh(Number value){
 		try {
 			lock.lock();
+			lastUpdated = System.currentTimeMillis();
 			last = current;
 			current = value;
 			if(value.doubleValue() < min.doubleValue())
@@ -96,6 +99,7 @@ public class Metric {
 			values.put("min", min);
 			values.put("max", max);
 			values.put("delta", delta);
+			values.put("lastUpdated", lastUpdated);
 		} catch (Exception e) {
 			// TODO: handle exception
 		}finally{

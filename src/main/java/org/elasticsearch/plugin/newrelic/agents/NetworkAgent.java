@@ -20,8 +20,23 @@ package org.elasticsearch.plugin.newrelic.agents;
 
 import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
 import org.elasticsearch.monitor.network.NetworkStats;
+import org.elasticsearch.plugin.newrelic.model.Metric;
 
 public class NetworkAgent extends NodeAgent {
+
+	public NetworkAgent() {
+		metrics.put("network/tcp/activeOpen", new Metric("network/tcp/activeOpen"));
+		metrics.put("network/tcp/passiveOpen", new Metric("network/tcp/passiveOpen"));
+		metrics.put("network/tcp/currentEstabilished", new Metric("network/tcp/currentEstabilished"));
+		metrics.put("network/tcp/inSegs", new Metric("network/tcp/inSegs"));
+		metrics.put("network/tcp/outSegs", new Metric("network/tcp/outSegs"));
+		metrics.put("network/tcp/retranSegs", new Metric("network/tcp/retranSegs"));
+		metrics.put("network/tcp/estabResets", new Metric("network/tcp/estabResets"));
+		metrics.put("network/tcp/attemptsFails", new Metric("network/tcp/attemptsFails"));
+		metrics.put("network/tcp/inErrs", new Metric("network/tcp/inErrs"));
+		metrics.put("network/tcp/outRsts", new Metric("network/tcp/outRsts"));
+
+	}
 
 	@Override
 	public void execute(NodeStats nodeStats) {
@@ -29,16 +44,17 @@ public class NetworkAgent extends NodeAgent {
 		
 		if(networkStats != null){
 			logger.debug("Running NetworkAgent");
-			collector.recordMetric("network/tcp/activeOpen", networkStats.tcp().activeOpens());
-			collector.recordMetric("network/tcp/passiveOpen", networkStats.tcp().passiveOpens());
-			collector.recordMetric("network/tcp/currentEstabilished", networkStats.tcp().currEstab());
-			collector.recordMetric("network/tcp/inSegs", networkStats.tcp().inSegs());
-			collector.recordMetric("network/tcp/outSegs", networkStats.tcp().outSegs());
-			collector.recordMetric("network/tcp/retranSegs", networkStats.tcp().retransSegs());
-			collector.recordMetric("network/tcp/estabResets", networkStats.tcp().estabResets());
-			collector.recordMetric("network/tcp/attemptsFails", networkStats.tcp().attemptFails());
-			collector.recordMetric("network/tcp/inErrs", networkStats.tcp().inErrs());
-			collector.recordMetric("network/tcp/outRsts", networkStats.tcp().outRsts());
+			collector.recordMetric(metrics.get("network/tcp/activeOpen").refresh(networkStats.tcp().activeOpens()));
+			collector.recordMetric(metrics.get("network/tcp/passiveOpen").refresh(networkStats.tcp().passiveOpens()));
+			collector.recordMetric(metrics.get("network/tcp/currentEstabilished").refresh(networkStats.tcp().currEstab()));
+
+			collector.recordMetric(metrics.get("network/tcp/inSegs").refresh( networkStats.tcp().inSegs()));
+			collector.recordMetric(metrics.get("network/tcp/outSegs").refresh( networkStats.tcp().outSegs()));
+			collector.recordMetric(metrics.get("network/tcp/retranSegs").refresh( networkStats.tcp().retransSegs()));
+			collector.recordMetric(metrics.get("network/tcp/estabResets").refresh( networkStats.tcp().estabResets()));
+			collector.recordMetric(metrics.get("network/tcp/attemptsFails").refresh( networkStats.tcp().attemptFails()));
+			collector.recordMetric(metrics.get("network/tcp/inErrs").refresh( networkStats.tcp().inErrs()));
+			collector.recordMetric(metrics.get("network/tcp/outRsts").refresh( networkStats.tcp().outRsts()));
 			
 		}
 
