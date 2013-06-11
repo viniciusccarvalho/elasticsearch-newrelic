@@ -28,17 +28,17 @@ public class ThreadPoolAgent extends NodeAgent {
 
 	@Override
 	public void execute(NodeStats nodeStats) {
-		ThreadPoolStats poolStats = nodeStats.threadPool();
+		ThreadPoolStats poolStats = nodeStats.getThreadPool();
 		if(poolStats != null){
 			logger.debug("Running ThreadPoolAgent");
 			Iterator<Stats> it = poolStats.iterator();
 			while(it.hasNext()){
 				Stats stats = it.next();
 				if(stats != null){
-					collector.recordMetric("pool/"+stats.getName()+"/active", stats.active());
-					collector.recordMetric("pool/"+stats.getName()+"/queue", stats.queue());
-					collector.recordMetric("pool/"+stats.getName()+"/rejected", stats.rejected());
-					collector.recordMetric("pool/"+stats.getName()+"/threads", stats.threads());
+					collector.recordMetric("pool/"+stats.getName()+"/active", stats.getActive());
+					collector.recordMetric("pool/"+stats.getName()+"/queue", stats.getQueue());
+					collector.recordMetric("pool/"+stats.getName()+"/rejected", stats.getRejected());
+					collector.recordMetric("pool/"+stats.getName()+"/threads", stats.getThreads());
 				}
 			}
 		}		

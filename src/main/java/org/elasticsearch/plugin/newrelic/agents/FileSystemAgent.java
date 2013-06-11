@@ -30,10 +30,10 @@ public class FileSystemAgent extends NodeAgent {
 			Iterator<Info> it = fsStats.iterator();
 			while(it.hasNext()){
 				Info fsInfo = it.next();
-				totalReads += fsInfo.diskReads();
-				totalWrites += fsInfo.diskWrites();
-				totalReadSize += fsInfo.diskReadSizeInBytes();
-				totalWriteSize += fsInfo.diskWriteSizeInBytes();
+				totalReads += fsInfo.getDiskReads();
+				totalWrites += fsInfo.getDiskWrites();
+				totalReadSize += fsInfo.getDiskReadSizeInBytes();
+				totalWriteSize += fsInfo.getDiskWriteSizeInBytes();
 			}
 			
 			try {

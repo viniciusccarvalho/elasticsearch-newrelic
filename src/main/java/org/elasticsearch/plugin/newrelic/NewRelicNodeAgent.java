@@ -86,8 +86,8 @@ public class NewRelicNodeAgent {
 		// we don't have it
 		NodesStatsResponse response = client.admin().cluster().nodesStats(new NodesStatsRequest().all()).actionGet();
 		NodeStats node = null;
-		for (NodeStats n : response.nodes()) {
-			if (n.node().getName().equals(this.nodeName)) {
+		for (NodeStats n : response.getNodes()) {
+			if (n.getNode().getName().equals(this.nodeName)) {
 				node = n;
 				break;
 			}
