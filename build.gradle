@@ -23,8 +23,8 @@ sourceSets {
 eclipse.classpath.plusConfigurations += configurations.provided
 
 dependencies {
-    provided 'org.elasticsearch:elasticsearch:0.20.5'
-    compile 'com.newrelic.agent.java:newrelic-api:2.14.0'
+    provided 'org.elasticsearch:elasticsearch:0.90.1'
+    compile 'com.newrelic.agent.java:newrelic-api:2.20.0'
     testCompile 'junit:junit:4.8.2'
 	testCompile 'org.mockito:mockito-all:1.9.5'
 }

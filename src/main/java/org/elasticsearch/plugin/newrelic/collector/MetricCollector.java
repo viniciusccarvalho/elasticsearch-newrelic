@@ -26,8 +26,8 @@ package org.elasticsearch.plugin.newrelic.collector;
  *
  */
 public interface MetricCollector {
-	
+
 	public void recordMetric(String name, Number value);
 	public void recordResponseTimeMetric(String name, long millis);
-	
+
 }
