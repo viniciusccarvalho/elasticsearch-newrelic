@@ -26,7 +26,7 @@ import com.newrelic.api.agent.NewRelic;
 public class NewRelicCollector implements MetricCollector {
 
 	private ESLogger logger = ESLoggerFactory.getLogger(NewRelicCollector.class.getName());
-	
+
 	@Override
 	public void recordMetric(String name, Number value) {
 		if(value != null){
