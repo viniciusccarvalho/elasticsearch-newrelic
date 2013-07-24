@@ -4,3 +4,6 @@ build/**
 .settings
 .gradle
 bin/**
+.idea/**
+out/**
+*.iml

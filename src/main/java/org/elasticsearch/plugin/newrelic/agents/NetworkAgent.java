@@ -25,16 +25,16 @@ public class NetworkAgent extends NodeAgent {
 
 	@Override
 	public void execute(NodeStats nodeStats) {
-		NetworkStats networkStats =  nodeStats.network();
+		NetworkStats networkStats =  nodeStats.getNetwork();
 		
 		if(networkStats != null){
 			logger.debug("Running NetworkAgent");
-			collector.recordMetric("network/tcp/activeOpen", networkStats.tcp().activeOpens());
-			collector.recordMetric("network/tcp/passiveOpen", networkStats.tcp().passiveOpens());
-			collector.recordMetric("network/tcp/currentEstabilished", networkStats.tcp().currEstab());
+			collector.recordMetric("network/tcp/activeOpens", networkStats.tcp().activeOpens());
+			collector.recordMetric("network/tcp/passiveOpens", networkStats.tcp().passiveOpens());
+			collector.recordMetric("network/tcp/currentEstablished", networkStats.tcp().currEstab());
 			collector.recordMetric("network/tcp/inSegs", networkStats.tcp().inSegs());
 			collector.recordMetric("network/tcp/outSegs", networkStats.tcp().outSegs());
-			collector.recordMetric("network/tcp/retranSegs", networkStats.tcp().retransSegs());
+			collector.recordMetric("network/tcp/retransSegs", networkStats.tcp().retransSegs());
 			collector.recordMetric("network/tcp/estabResets", networkStats.tcp().estabResets());
 			collector.recordMetric("network/tcp/attemptsFails", networkStats.tcp().attemptFails());
 			collector.recordMetric("network/tcp/inErrs", networkStats.tcp().inErrs());
