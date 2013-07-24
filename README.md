@@ -1,6 +1,11 @@
 elasticsearch-newrelic
 ======================
 
+| Elasticsearch version | branch |
+| ---------------- | ----------- |
+| 0.90.0 -> 0.90.2 | master |
+| 0.20.1 -> 0.20.5 | 0.20-version |
+
 This plugin export node stats (indices, pool, network, http) to a newrelic account. The plugin works at a node level, new relic
 will act as an agreggator for metrics of each node inside your cluster.
 
